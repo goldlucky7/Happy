@@ -9,8 +9,8 @@
 |---|---|
 | 확인 날짜 | 2026-08-28 |
 | 파일 | `https://raw.githubusercontent.com/goldlucky7/jeju/main/index.html` |
-| 크기 | 343839 bytes |
-| 지문 (sha256 앞 16자) | `71338131fd878902` |
+| 크기 | 348228 bytes |
+| 지문 (sha256 앞 16자) | `ebcd40b5eb31866a` |
 | 사이드카 파일 | `updates.json` (요즘 뜨는 곳 피드) |
 
 ## 장소 수
@@ -53,6 +53,7 @@
 - 카테고리별 우선 추천·티어 그룹 (맛집/소품샵/술집/호텔/마사지) + 호텔 성급
 - 💸 가성비 카페 탭 (바다·경치 / 이동 중 / 시내·시장 3그룹)
 - ⭐ 내 일정 탭 (가보고 싶어요 담기, 방문 예정 날짜, 지역별·날짜별 전환)
+- 🚗 동선 순서 (묶음 안 최적 경로 정렬, 카드 순번·구간 거리, 총 거리 요약)
 - 🎟 롯데렌터카 제주 웰컴 쿠폰팩 제휴처 39곳 (카드 배지·할인율 직접 메모·전체 모달)
 - 🅿️ 주차 정보 배지·팁·주차장 지도 링크
 - 📋 주소 복사 · 📷 대표 사진 보기 · 📞 전화 걸기
@@ -69,22 +70,23 @@
 ```
 BARTIER BAR_T CAT CATS CAT_EMOJI CHEAPG CHEAP_GROUPS CHIPS CHO_LIST COUPLE_KEY
 DOW EFF EFFORT EFF_OF EFF_ORDER FT FTYPE GLOSSARY GLO_KEYS GLO_RE HOTELTIER
-HOTEL_T KEY LL LOTTE LOTTE_ALL LOTTE_IDS LOTTE_URL MUST MUSTBAR MUSTEAT
-MUSTHOTEL MUSTSHOP MUSTSPA NEAR_LIMIT_KM NM PHOTO PK PKMAP PKT PK_OF PK_ORDER
-PLACES READ_URL SHOPTIER SHOP_T SPATIER SPA_T STARS TEL TIERMAP UPD_SEEN_KEY
-UPD_URL VJ WRITE_URL ZONES ZONE_KW ZONE_OF activeEff activeZone addCheapGroups
-addCustomPlace addEffGroups addFoodGroups addGrid addSubHead addTierGroups
-allPlaces autoSync barNear byEff byPk chipMatch chipsEl clearNearby copyAddr
-currentFilter customPlaces customToCard daysAway deleteCustomPlace distKm
-drawLotte drawUpd drawUpdFail effGrid effOf escHtml fetchRemote fmtDay fmtDist
-ftOf gloDef gloInput gloModal gloSug gloWord glossify hasPlace hoursModal
-isWished list lotteModal lsGet lsSet makeCard markUpdBtn matchesEff
-matchesSearch mergeCustom modal nearbyBtn nearbyOn normalize onSelEnd online
-openGlo openUpd passes pkOf placeText planGroup pushRemote rateOf rateSrc
-rates render renderEffMenu renderFilterBar renderHoursTable renderPlan
-renderPlanByDate renderPlanByZone renderZoneMenu saveLocal saveRate saveWish
-scrollToList searchClear searchInput searchQ selBtn setAiLinks setTab
-setWishDate showGlo syncChips toCho toggleBarNear toggleVisit toggleWish
-updBtn updFeed updModal updSeen updateProgress updateSyncLabel
-updateVisitedTab visibleCount visited wish zoneGrid zoneOf
+HOTEL_T JEJU_AIRPORT KEY LL LOTTE LOTTE_ALL LOTTE_IDS LOTTE_URL MUST MUSTBAR
+MUSTEAT MUSTHOTEL MUSTSHOP MUSTSPA NEAR_LIMIT_KM NM PHOTO PK PKMAP PKT PK_OF
+PK_ORDER PLACES READ_URL SHOPTIER SHOP_T SPATIER SPA_T STARS TEL TIERMAP
+UPD_SEEN_KEY UPD_URL VJ WRITE_URL ZONES ZONE_KW ZONE_OF activeEff activeZone
+addCheapGroups addCustomPlace addEffGroups addFoodGroups addGrid addRouteGrid
+addSubHead addTierGroups allPlaces autoSync barNear byEff byPk chipMatch
+chipsEl clearNearby copyAddr currentFilter customPlaces customToCard daysAway
+deleteCustomPlace distKm drawLotte drawUpd drawUpdFail effGrid effOf escHtml
+fetchRemote fmtDay fmtDist ftOf gloDef gloInput gloModal gloSug gloWord
+glossify hasPlace hopKm hoursModal isWished list llOf lotteModal lsGet lsSet
+makeCard markUpdBtn matchesEff matchesSearch mergeCustom modal nearbyBtn
+nearbyOn normalize onSelEnd online openGlo openUpd passes pathLen pkOf
+placeText planGroup pushRemote rateOf rateSrc rates render renderEffMenu
+renderFilterBar renderHoursTable renderPlan renderPlanByDate renderPlanByZone
+renderZoneMenu routeNote routeOrder saveLocal saveRate saveWish scrollToList
+searchClear searchInput searchQ selBtn setAiLinks setTab setWishDate showGlo
+syncChips toCho toggleBarNear toggleVisit toggleWish updBtn updFeed updModal
+updSeen updateProgress updateSyncLabel updateVisitedTab visibleCount visited
+wish zoneGrid zoneOf
 ```
