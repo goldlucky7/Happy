@@ -17,14 +17,22 @@
 
 ## 작업 규칙
 
-- 작업 브랜치: `claude/skill-search-feature-sd6plu`
+- 작업 브랜치는 **세션마다 다르게 지정된다.** 그 세션의 작업 지시에 적힌 이름을 쓸 것 (문서에 남은 옛 이름을 그대로 쓰지 말 것)
 - 이전 PR이 머지된 상태이므로 **매번 `origin/main`에서 브랜치를 새로 시작**할 것
   ```bash
-  git fetch origin main && git checkout -B claude/skill-search-feature-sd6plu origin/main
+  git fetch origin main && git checkout -B <이번 세션 브랜치> origin/main
   ```
 - 수정 → 커밋 → 푸시 → PR 생성 → **머지까지** 한 번에 끝낸다 (사용자가 매번 "머지해줘"라고 말하지 않아도 되게)
 
-## 관련 저장소
+## 관련 저장소 — 둘의 역할이 다름
 
-스탬프북 웹사이트 본체는 별도 저장소에 있습니다: `goldlucky7/jeju`
-(배포 주소: https://goldlucky7.github.io/jeju/)
+| 저장소 | 담는 것 | 언제 고치나 |
+|---|---|---|
+| `goldlucky7/Happy` (여기) | **스킬 문서만.** `travel-stampbook`(만드는 법) · `stampbook-skill-sync`(동기화) · `template-state.md`(기록) | 제주 사이트에 새 기능이 생겨서 "만드는 법"에 규칙을 추가해야 할 때 |
+| `goldlucky7/jeju` | **웹사이트 본체.** `index.html` · `updates.json` 두 파일뿐 (스킬 파일 없음) | 장소를 추가·수정하거나 사이트 표기를 고칠 때 |
+
+- 배포 주소: https://goldlucky7.github.io/jeju/ (main에 푸시하면 1~2분 뒤 자동 반영)
+- **제주에는 스킬 파일이 없다.** "스킬 업데이트"는 항상 Happy 쪽만 고치는 일이다
+- 제주 저장소도 이제 Claude가 직접 푸시할 수 있다 (Claude GitHub 앱에 연결됨).
+  403이 나면 https://github.com/apps/claude/installations/select_target 에서 jeju 체크 확인
+- 새 지역판(부산 등)도 `goldlucky7/jeju` 안에 `busan.html` 형태로 함께 올린다
