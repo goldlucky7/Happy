@@ -9,9 +9,9 @@
 |---|---|
 | 확인 날짜 | 2026-08-29 |
 | 파일 | `https://raw.githubusercontent.com/goldlucky7/jeju/main/index.html` |
-| 크기 | 372101 bytes |
-| 지문 (sha256 앞 16자) | `e70a2226067bf3f9` |
-| 마지막 반영 커밋 | `d03077f` 팥빙수 8곳 추가 |
+| 크기 | 372118 bytes |
+| 지문 (sha256 앞 16자) | `fea256ff282ed750` |
+| 마지막 반영 커밋 | `10ab2a8` 곳수 표기 정정 (263 → 295) |
 | 사이드카 파일 | `updates.json` (요즘 뜨는 곳 피드) |
 
 ## 장소 수
@@ -30,42 +30,21 @@
 
 세부 카테고리 칩: **17개**
 
-⚠️ 템플릿 헤더 표기는 `263 PLACES`로 실제(295)와 어긋나 있음. 새 지역판을 만들 땐 실제 개수로 넣을 것.
+헤더 표기(`295 PLACES`)와 실제 PLACES 개수가 일치함. 새 지역판을 만들 때도 실제 개수를 세어 넣을 것.
 
-## 🔧 제주 사이트에 아직 못 올린 수정 (밀린 작업)
+## ✅ 밀린 작업 없음
 
-**수정 내용은 확정·검증 완료. 업로드만 남았다.** 아래 3줄을 그대로 바꾸면 끝난다.
+2026-08-29 기준 제주 사이트와 스킬 문서가 모두 최신이다.
 
-| 위치 | 현재 | 고칠 값 |
-|---|---|---|
-| `<title>` | `... 호텔·마사지 263선` | `... 호텔·마사지·가성비카페 295선` |
-| `.h-eyebrow` | `JEJU STAMP BOOK · 263 PLACES` | `JEJU STAMP BOOK · 295 PLACES` |
-| `.h-sub` 첫 문장 | `모두를 위한 263곳.` | `모두를 위한 295곳.` |
+직전까지 밀려 있던 곳수 표기 오류(263 → 295)는 커밋 `10ab2a8`로 반영 완료.
+`<title>`·`.h-eyebrow`·`.h-sub` 세 곳을 295로 맞추고 제목에 가성비카페를 추가했으며,
+GitHub Pages 배포(run #28)까지 성공을 확인했다.
 
-(295는 PLACES 배열 실측치이고 중복 id 없음을 확인함. 제목의 카테고리 나열에
-가성비 카페가 빠져 있어 함께 보완하는 것)
-
-### 왜 아직 못 올렸나 (2026-08-29 재시도, 두 경로 모두 403)
-
-| 시도한 방법 | 결과 |
-|---|---|
-| `add_repo` push 권한으로 붙이기 | 붙기는 하지만 `push_check: refused` |
-| `git push origin HEAD:main` | 403 — "Claude doesn't have GitHub access to goldlucky7/jeju for your organization" |
-| GitHub API (`create_branch`) | 403 — "Resource not accessible by integration" |
-
-→ **세션 자격증명 문제가 아니라 `goldlucky7/jeju`에 Claude GitHub 앱이 연결돼 있지 않은 것.**
-`goldlucky7/Happy`에는 연결돼 있어서 이 저장소 푸시는 정상 동작한다.
-
-### 다음 세션에서 뚫는 방법 (둘 중 하나)
-
-1. **Claude GitHub 앱에 jeju 저장소 추가** (한 번만 하면 영구 해결)
-   - https://github.com/apps/claude/installations/select_target 에서 jeju 체크
-   - 또는 claude.ai 설정 → 커넥터에서 GitHub 다시 연결
-   - 이후에는 `add_repo` push → `git push`로 바로 올라간다
-2. **사용자에게 jeju 배포용 PAT를 받아 Contents API로 올리기** (앱 연결 없이 즉시 가능)
-   - `travel-stampbook` 스킬 5단계에 절차가 적혀 있음
-   - 현재 발급본 만료 예정: 2026-09-27
-   - ⚠️ 받은 토큰은 어느 파일에도 적지 말 것
+> 참고: 예전에 `goldlucky7/jeju` 푸시가 403으로 막혔던 것은 Claude GitHub 앱에
+> 이 저장소가 연결돼 있지 않아서였다. 사용자가 앱에 jeju를 추가해 해결됐고,
+> 이제 `add_repo`(access: push) → `git push origin HEAD:main`으로 바로 올라간다.
+> 다시 403이 나면 https://github.com/apps/claude/installations/select_target 에서
+> jeju가 아직 체크돼 있는지 확인할 것.
 
 ## 반영 완료된 기능
 
