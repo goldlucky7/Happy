@@ -41,6 +41,14 @@ git -C /home/user/jeju log --oneline -10
 git -C /home/user/jeju diff <마지막반영커밋> origin/main -- index.html
 ```
 - 마지막 반영 커밋이 곧 `origin/main`이면 → 변경 없음. "아직 반영할 새 기능이 없어요"라고 알리고 종료
+- ⚠️ **새 기능이 아직 main에 머지 안 됐을 수 있다.** 같은 세션에서 제주를 고치고 바로 스킬을 맞추는 경우가 그렇다.
+  `origin/main`만 보면 "변경 없음"으로 보이니 브랜치도 함께 확인할 것:
+  ```bash
+  git -C /home/user/jeju branch -r          # claude/... 작업 브랜치가 있는지
+  git -C /home/user/jeju log --oneline origin/main -1
+  ```
+  브랜치에만 있으면 그 브랜치 기준으로 스킬을 맞추고, `template-state.md`에 **"main에 아직 안 올라감"을 반드시 적어둘 것.**
+  안 적으면 다음 동기화 때 크기·지문이 옛날 값으로 나와 "기능이 사라졌다"고 오판한다
 - 기록에 커밋이 안 적혀 있는 옛 형식이면 아래로 지문을 맞춰 그 커밋을 찾는다:
 ```bash
 for c in $(git -C /home/user/jeju log --format=%h -10); do
@@ -92,6 +100,11 @@ grep '^[<>]' d.txt | cut -c1-140 | head -40
 4. **기존 스탬프북 수정 요청일 때** — 장소를 새로 추가할 때 같이 채워야 할 데이터에 추가
 
 ⚠️ **로직 함수는 "변경 금지" 목록에 이름을 추가**할 것. 새 지역판을 만들 때 실수로 고치면 기능이 죽는다.
+
+**바뀐 게 카테고리(탭) 하나가 통째로 생긴 것이라면** 위 4곳에 더해
+`travel-stampbook/SKILL.md`의 "카테고리를 통째로 새로 만들 때" 표도 함께 손볼 것.
+카테고리 추가는 장소 추가와 달리 CSS·탭 버튼·`CATS`·`render()` 분기까지 건드려야 해서
+체크리스트가 따로 있고, 하나만 빠져도 탭이 비거나 색이 깨진다.
 
 ### 4. template-state.md 갱신
 이번에 확인한 크기·지문·구조 목록·장소 수로 `template-state.md`를 덮어쓴다. 다음 동기화가 쉬워진다.
