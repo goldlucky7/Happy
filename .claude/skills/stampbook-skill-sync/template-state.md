@@ -34,9 +34,7 @@
 
 ## 🔧 제주 사이트에 아직 못 올린 수정 (밀린 작업)
 
-2026-08-28 확인, 2026-08-29 재확인(여전히 미반영). 사용자가 수정에 동의했으나,
-당시 세션이 `goldlucky7/jeju`에 **쓰기 권한이 없어 업로드하지 못함** (git push·Contents API 모두 403).
-**제주 저장소에 쓰기 권한이 있는 세션에서 작업할 때 아래를 먼저 반영할 것:**
+**수정 내용은 확정·검증 완료. 업로드만 남았다.** 아래 3줄을 그대로 바꾸면 끝난다.
 
 | 위치 | 현재 | 고칠 값 |
 |---|---|---|
@@ -44,7 +42,30 @@
 | `.h-eyebrow` | `JEJU STAMP BOOK · 263 PLACES` | `JEJU STAMP BOOK · 295 PLACES` |
 | `.h-sub` 첫 문장 | `모두를 위한 263곳.` | `모두를 위한 295곳.` |
 
-(제목의 카테고리 나열에 가성비 카페가 빠져 있어 함께 보완하는 것)
+(295는 PLACES 배열 실측치이고 중복 id 없음을 확인함. 제목의 카테고리 나열에
+가성비 카페가 빠져 있어 함께 보완하는 것)
+
+### 왜 아직 못 올렸나 (2026-08-29 재시도, 두 경로 모두 403)
+
+| 시도한 방법 | 결과 |
+|---|---|
+| `add_repo` push 권한으로 붙이기 | 붙기는 하지만 `push_check: refused` |
+| `git push origin HEAD:main` | 403 — "Claude doesn't have GitHub access to goldlucky7/jeju for your organization" |
+| GitHub API (`create_branch`) | 403 — "Resource not accessible by integration" |
+
+→ **세션 자격증명 문제가 아니라 `goldlucky7/jeju`에 Claude GitHub 앱이 연결돼 있지 않은 것.**
+`goldlucky7/Happy`에는 연결돼 있어서 이 저장소 푸시는 정상 동작한다.
+
+### 다음 세션에서 뚫는 방법 (둘 중 하나)
+
+1. **Claude GitHub 앱에 jeju 저장소 추가** (한 번만 하면 영구 해결)
+   - https://github.com/apps/claude/installations/select_target 에서 jeju 체크
+   - 또는 claude.ai 설정 → 커넥터에서 GitHub 다시 연결
+   - 이후에는 `add_repo` push → `git push`로 바로 올라간다
+2. **사용자에게 jeju 배포용 PAT를 받아 Contents API로 올리기** (앱 연결 없이 즉시 가능)
+   - `travel-stampbook` 스킬 5단계에 절차가 적혀 있음
+   - 현재 발급본 만료 예정: 2026-09-27
+   - ⚠️ 받은 토큰은 어느 파일에도 적지 말 것
 
 ## 반영 완료된 기능
 
