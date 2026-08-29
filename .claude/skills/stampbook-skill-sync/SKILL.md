@@ -56,6 +56,17 @@ console.log(c, "total:", Object.values(c).reduce((a,b)=>a+b,0));
 ```
 - 새 사이드카 파일(예: `updates.json`)이 생겼는지도 확인
 
+⚠️ **구조 목록만 믿지 말 것.** 위 비교는 줄 맨 앞(들여쓰기 없는) 선언만 잡는다.
+**"새 이름 없음"인데 파일 크기가 늘었다면 기능이 아니라 데이터·링크가 바뀐 것**이므로
+반드시 실제 diff를 볼 것:
+```bash
+diff jeju_prev.html jeju_now.html > d.txt
+grep -c '^>' d.txt          # 추가된 줄 수
+grep '^[<>]' d.txt | cut -c1-140 | head -40
+```
+장소 이름·주소·링크가 대량으로 바뀌는 **데이터 품질 개선**도 스킬에 반영할 내용이다
+(무엇을 어떻게 고쳤는지를 새 지역 제작 규칙으로 옮겨 적을 것).
+
 ### 3. 스킬 문서에 반영
 `.claude/skills/travel-stampbook/SKILL.md`를 고친다. 새 기능마다 **아래 4곳을 빠짐없이** 손볼 것:
 
