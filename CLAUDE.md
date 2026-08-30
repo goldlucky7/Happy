@@ -29,10 +29,13 @@
 | 저장소 | 담는 것 | 언제 고치나 |
 |---|---|---|
 | `goldlucky7/Happy` (여기) | **스킬 문서만.** `travel-stampbook`(만드는 법) · `stampbook-skill-sync`(동기화) · `template-state.md`(기록) | 제주 사이트에 새 기능이 생겨서 "만드는 법"에 규칙을 추가해야 할 때 |
-| `goldlucky7/jeju` | **웹사이트 본체.** `index.html` · `updates.json` 두 파일뿐 (스킬 파일 없음) | 장소를 추가·수정하거나 사이트 표기를 고칠 때 |
+| `goldlucky7/jeju` | **웹사이트 본체.** `index.html` · `updates.json` · `lib/`(탑승권 인식기) · `tools/`(인식 검증 도구) · `CLAUDE.md`(인수인계) | 장소를 추가·수정하거나 사이트 기능을 고칠 때 |
 
 - 배포 주소: https://goldlucky7.github.io/jeju/ (main에 푸시하면 1~2분 뒤 자동 반영)
 - **제주에는 스킬 파일이 없다.** "스킬 업데이트"는 항상 Happy 쪽만 고치는 일이다
 - 제주 저장소도 이제 Claude가 직접 푸시할 수 있다 (Claude GitHub 앱에 연결됨).
   403이 나면 https://github.com/apps/claude/installations/select_target 에서 jeju 체크 확인
 - 새 지역판(부산 등)도 `goldlucky7/jeju` 안에 `busan.html` 형태로 함께 올린다
+- **제주 쪽 작업을 이어받을 때는 `goldlucky7/jeju`의 `CLAUDE.md`를 먼저 볼 것.**
+  지금 상태·남은 일·이미 밟은 함정·확인 방법이 정리돼 있다.
+  저장소를 붙이면(`add_repo` → clone → `register_repo_root`) 자동으로 읽힌다
