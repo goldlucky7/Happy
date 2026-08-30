@@ -7,12 +7,12 @@
 
 | 항목 | 값 |
 |---|---|
-| 확인 날짜 | 2026-08-29 |
+| 확인 날짜 | 2026-08-30 |
 | 파일 | `https://raw.githubusercontent.com/goldlucky7/jeju/main/index.html` |
-| 크기 | 372118 bytes |
-| 지문 (sha256 앞 16자) | `fea256ff282ed750` |
-| 마지막 반영 커밋 | `10ab2a8` 곳수 표기 정정 (263 → 295) |
-| 사이드카 파일 | `updates.json` (요즘 뜨는 곳 피드) |
+| 크기 | 420775 bytes |
+| 지문 (sha256 앞 16자) | `50a44c79c6d5bd12` |
+| 마지막 반영 커밋 | `603523e` 탑승권 QR 카메라 인식 수정 + 인식기 저장소에 포함 |
+| 사이드카 파일 | `updates.json` (요즘 뜨는 곳 피드) · `lib/zxing.min.js` · `lib/jsQR.js` (탑승권 인식기) |
 
 ## 장소 수
 
@@ -30,21 +30,20 @@
 
 세부 카테고리 칩: **17개**
 
-헤더 표기(`295 PLACES`)와 실제 PLACES 개수가 일치함. 새 지역판을 만들 때도 실제 개수를 세어 넣을 것.
+헤더 표기(`295 PLACES`)와 실제 PLACES 개수가 일치함. 이번 변경은 **기능만 추가**됐고 장소 수·칩 수는 그대로다.
 
 ## ✅ 밀린 작업 없음
 
-2026-08-29 기준 제주 사이트와 스킬 문서가 모두 최신이다.
+2026-08-30 기준 제주 사이트와 스킬 문서가 모두 최신이다.
 
-직전까지 밀려 있던 곳수 표기 오류(263 → 295)는 커밋 `10ab2a8`로 반영 완료.
-`<title>`·`.h-eyebrow`·`.h-sub` 세 곳을 295로 맞추고 제목에 가성비카페를 추가했으며,
-GitHub Pages 배포(run #28)까지 성공을 확인했다.
+이번에 반영한 것: 커밋 `188adc2` → `f235625`(main 머지) → `603523e`(인식 버그 수정).
+장소 데이터는 손대지 않았고 ✈️ 항공편 기능 한 덩어리가 통째로 들어왔다.
 
-> 참고: 예전에 `goldlucky7/jeju` 푸시가 403으로 막혔던 것은 Claude GitHub 앱에
-> 이 저장소가 연결돼 있지 않아서였다. 사용자가 앱에 jeju를 추가해 해결됐고,
-> 이제 `add_repo`(access: push) → `git push origin HEAD:main`으로 바로 올라간다.
-> 다시 403이 나면 https://github.com/apps/claude/installations/select_target 에서
-> jeju가 아직 체크돼 있는지 확인할 것.
+> 참고: `188adc2`는 처음에 기능 브랜치에만 올라가 있어서 사이트에 반영되지 않았다.
+> 스탬프북 페이지는 **`main`을 본다**. 앞으로도 작업이 끝나면 반드시 main 까지 올릴 것.
+
+> 참고: `goldlucky7/jeju` 푸시는 `add_repo`(access: push) → `git push origin main` 으로 바로 된다.
+> 403이 나면 https://github.com/apps/claude/installations/select_target 에서 jeju 체크 확인.
 
 ## 반영 완료된 기능
 
@@ -69,38 +68,82 @@ GitHub Pages 배포(run #28)까지 성공을 확인했다.
 - 저장 구조 `{v:도장, c:추가장소, w:가보고 싶은 곳+날짜, r:할인율 메모}`
 - 🔗 카드 바깥 링크 3종 (네이버지도 / 관광포털 검색 / 후기·정보 검색) — 전부 장소 이름 기반 검색 링크
 - 📝 데이터 품질: 지도에서 검색되는 이름 표기, 시장 안 가게는 지번+시장 내 주소
+- ✈️ **항공편 · 탑승권 QR 인식** (2026-08-30 추가) — 아래 상세
 
-## 장소 하나를 추가할 때 같이 채워지는 표 (d03077f에서 실제로 건드린 곳)
+## ✈️ 항공편 기능 상세 (새 지역판을 만들 때 꼭 볼 것)
+
+화면 세 개가 버튼 하나에 들어 있다: 🎫 탑승권 인식 / 🕐 항공사 운영시간 / 🧭 공항에서 어디로.
+
+**지역마다 갈아끼워야 하는 데이터**
+
+| 이름 | 내용 |
+|---|---|
+| `AIRLINES` | 그 지역 노선 항공사 10곳 + 고객센터 번호·상담시간·수속 마감(국내선 30분/국제선 60분) |
+| `AIRPORTS` | 공항 코드→한글 이름. `kac`가 있으면 실시간 운항정보 링크가 자동으로 만들어짐 |
+| `CJU_LIVE` | 그 지역 공항 실시간 출발·도착 페이지 주소 (변수명은 그대로 둬도 됨) |
+| `AP_STEPS` | 공항 층별 구조 + 탑승까지 6단계 안내 |
+| `CARRIER_ETC` | 외항사 코드→한글 이름 (표시용) |
+
+**설계상 반드시 지킬 것**
+
+- 탑승권 바코드(IATA BCBP)에는 **출발 시각과 탑승구가 들어 있지 않다.** 규격에 그 칸이 없다.
+  시각은 사용자가 한 번 넣고, 탑승구는 실시간 조회 링크로 넘긴다. 이 전제를 바꾸려 하지 말 것
+- 카운터·탑승구 번호는 **당일 배정**이라 코드에 적지 않는다. "전광판 확인"으로 안내
+- 탑승객 이름·예약번호는 **공유 저장소에 올리지 않는다.** 각자 기기에만(`jeju_flights_v1`)
+- 인식기는 3단계로 고른다: 기기 내장(BarcodeDetector) → ZXing(`lib/zxing.min.js`) → jsQR(`lib/jsQR.js`)
+
+**과거에 실제로 겪은 함정 (다시 밟지 말 것)**
+
+| 증상 | 원인 | 해결 |
+|---|---|---|
+| 카메라는 켜지는데 아무리 비춰도 반응 없음 | ZXing 자체 영상 기능이 `playing` 이벤트를 기다리는데 우리가 먼저 재생해 이벤트가 지나감 | ZXing 영상 기능을 쓰지 않고 프레임을 직접 떠서 넘김 (`pickEngine` 단일 루프) |
+| 인식기가 프레임을 못 읽음 | ZXing의 `decode(video)`가 화면을 제대로 못 떠옴 | 캔버스로 떠서 `HTMLCanvasElementLuminanceSource`로 넘김 (`zxDecodeCanvas`) |
+| 아이폰에서 카메라 권한이 조용히 거부됨 | 인식기 파일(수백 KB)을 먼저 받느라 버튼 누른 시점이 만료 | 카메라부터 열고 인식기를 나중에 고름 |
+| 통신망·차단기 뒤에서 인식 불가 | 인식기를 외부 CDN에서 받아옴 | `lib/`에 넣어 저장소에서 먼저 읽음 |
+
+## 장소 하나를 추가할 때 같이 채워지는 표
 
 `PLACES` · `TEL` · `PK` · `EFFORT` · `ZONE_OF` · `LL` — 6곳.
 테마가 새로 생기면 여기에 `CHIPS` 한 줄이 더 붙는다.
+(항공편 기능은 장소 데이터와 무관하므로 장소 추가 시 손댈 것 없음)
 
 ## 코드 구조 목록 (이 시점 기준)
 
 여기 **없는 이름이 새로 나타나면 그게 새 기능**이다.
-(d03077f에서는 이 목록이 그대로였고 데이터·칩만 늘었다 — 이름이 안 늘었어도
-파일 크기가 커졌으면 반드시 실제 diff를 볼 것)
+(데이터만 바뀌면 이름이 안 늘어도 파일 크기가 커진다 — 그럴 땐 반드시 실제 diff를 볼 것)
 
 ```
-BARTIER BAR_T CAT CATS CAT_EMOJI CHEAPG CHEAP_GROUPS CHIPS CHO_LIST COUPLE_KEY
-DOW EFF EFFORT EFF_OF EFF_ORDER FT FTYPE GLOSSARY GLO_KEYS GLO_RE HOTELTIER
-HOTEL_T JEJU_AIRPORT KEY LL LOTTE LOTTE_ALL LOTTE_IDS LOTTE_URL MUST MUSTBAR
-MUSTEAT MUSTHOTEL MUSTSHOP MUSTSPA NEAR_LIMIT_KM NM PHOTO PK PKMAP PKT PK_OF
-PK_ORDER PLACES READ_URL SHOPTIER SHOP_T SPATIER SPA_T STARS TEL TIERMAP
-UPD_SEEN_KEY UPD_URL VJ WRITE_URL ZONES ZONE_KW ZONE_OF activeEff activeZone
-addCheapGroups addCustomPlace addEffGroups addFoodGroups addGrid addRouteGrid
-addSubHead addTierGroups allPlaces autoSync barNear byEff byPk chipMatch
-chipsEl clearNearby copyAddr currentFilter customPlaces customToCard daysAway
-deleteCustomPlace distKm drawLotte drawUpd drawUpdFail effGrid effOf escHtml
-fetchRemote fmtDay fmtDist ftOf gloDef gloInput gloModal gloSug gloWord
-glossify hasPlace hopKm hoursModal isWished list llOf lotteModal lsGet lsSet
-makeCard markUpdBtn matchesEff matchesSearch mergeCustom modal nearbyBtn
-nearbyOn normalize onSelEnd online openGlo openUpd passes pathLen pkOf
-placeText planGroup pushRemote rateOf rateSrc rates render renderEffMenu
-renderFilterBar renderHoursTable renderPlan renderPlanByDate renderPlanByZone
-renderZoneMenu routeNote routeOrder saveLocal saveRate saveWish scrollToList
-searchClear searchInput searchQ selBtn setAiLinks setTab setWishDate showGlo
-syncChips toCho toggleBarNear toggleVisit toggleWish updBtn updFeed updModal
-updSeen updateProgress updateSyncLabel updateVisitedTab visibleCount visited
-wish zoneGrid zoneOf
+AIRLINES AIRLINE_OF AIRPORTS AP_STEPS BARTIER BAR_T CARRIER_ETC CAT CATS
+CAT_EMOJI CHEAPG CHEAP_GROUPS CHIPS CHO_LIST CJU_LIVE COUPLE_KEY DOW
+DOW_F EFF EFFORT EFF_OF EFF_ORDER FKEY FT FTYPE GLOSSARY GLO_KEYS GLO_RE
+HOTELTIER HOTEL_T ICAO_IATA JEJU_AIRPORT KEY LL LOTTE LOTTE_ALL
+LOTTE_IDS LOTTE_URL MUST MUSTBAR MUSTEAT MUSTHOTEL MUSTSHOP MUSTSPA
+NEAR_LIMIT_KM NM PHOTO PK PKMAP PKT PK_OF PK_ORDER PLACES QR_LIBS
+READ_URL SCAN_LIBS SHOPTIER SHOP_T SPATIER SPA_T STARS TEL TIERMAP
+UPD_SEEN_KEY UPD_URL VJ WRITE_URL ZONES ZONE_KW ZONE_OF activeEff
+activeZone addCheapGroups addCustomPlace addEffGroups addFoodGroups
+addGrid addRouteGrid addSubHead addTierGroups allPlaces apIsKR apLive
+apName apOptions autoSync barNear bcbpShift byEff byPk camError
+carrierName cdText chipMatch chipsEl clearNearby closeFlight copyAddr
+currentFilter customPlaces customToCard daysAway decodeImageFile
+delFlight deleteCustomPlace distKm drawLotte drawUpd drawUpdFail effGrid
+effOf ensureJsQR ensureZXing escHtml fetchRemote flCanvas flDraft flMsg
+flStream flightIntl flightModal flightSearch flightTimes fmtDateF fmtDay
+fmtDist fmtHM ftOf getNativeDetector gloDef gloInput gloModal gloSug
+gloWord glossify grabCanvas grabPixels hasPlace hopKm hoursModal
+isWished isoDate jsqrRead julianToISO list llOf loadFlights loadScript
+lotteModal lsGet lsSet makeCard markUpdBtn matchesEff matchesSearch
+mergeCustom modal myFlights nearbyBtn nearbyOn normalize onDecoded
+onSelEnd online openFlight openGlo openUpd parseBCBP parseLoose
+parsePass passes pathLen persistFlights pickEngine pkOf placeText
+planGroup pushRemote rateOf rateSrc rates render renderAirTable
+renderApSteps renderEffMenu renderFilterBar renderFlightBar
+renderFlightForm renderFlightPreview renderHoursTable renderPlan
+renderPlanByDate renderPlanByZone renderSavedFlights renderZoneMenu
+routeNote routeOrder saveDraft saveLocal saveRate saveWish scrollToList
+searchClear searchInput searchQ selBtn setAiLinks setEngine setFlPane
+setTab setWishDate showGlo sortFlights startScan stopScan syncChips
+syncDraft ticketHtml toCho toggleBarNear toggleVisit toggleWish updBtn
+updFeed updModal updSeen updateProgress updateSyncLabel updateVisitedTab
+visibleCount visited wish zoneGrid zoneOf zxDecodeCanvas zxHints
 ```
