@@ -9,10 +9,10 @@
 |---|---|
 | 확인 날짜 | 2026-08-30 |
 | 파일 | `https://raw.githubusercontent.com/goldlucky7/jeju/main/index.html` |
-| 크기 | 426268 bytes |
+| 크기 | 430629 bytes |
 | 지문 (sha256 앞 16자) | (아래 커밋 기준) |
-| 마지막 반영 커밋 | `67f8ba1` 인쇄된 탑승권 인식률 개선 + 사진 경로 버그 수정 |
-| 사이드카 파일 | `updates.json` (요즘 뜨는 곳 피드) · `lib/zxing.min.js` · `lib/jsQR.js` (탑승권 인식기) |
+| 마지막 반영 커밋 | `6e04d42` 안드로이드에서 탑승권이 안 읽히던 문제 수정 + 종이 탑승권 인식률 개선 |
+| 사이드카 파일 | `updates.json` (요즘 뜨는 곳 피드) · `lib/zxing.min.js` · `lib/jsQR.js` (탑승권 인식기) · `CLAUDE.md` (인수인계 문서) · `tools/` (탑승권 인식 검증 도구, 사이트에서는 쓰지 않음) |
 
 ## 장소 수
 
@@ -36,8 +36,14 @@
 
 2026-08-30 기준 제주 사이트와 스킬 문서가 모두 최신이다.
 
-이번에 반영한 것: 커밋 `188adc2` → `f235625`(main 머지) → `603523e`(인식 버그 수정).
-장소 데이터는 손대지 않았고 ✈️ 항공편 기능 한 덩어리가 통째로 들어왔다.
+이번에 반영한 것: 커밋 `b64a0a1`(인수인계 문서 + 검증 도구) → `6e04d42`(안드로이드 인식 실패 수정 +
+종이 탑승권 인식률 개선). 장소 데이터·칩은 그대로고 **탑승권 인식 쪽만** 손봤다.
+
+> 사용자의 실제 t'way 종이 탑승권 사진으로 확인해 고친 건이다. 사진은 예약번호가 들어 있어
+> 저장소에 넣지 않았다. 다시 검증할 일이 생기면 사용자에게 사진을 다시 받아 `/tmp`에서만 쓸 것.
+>
+> 사용자 기기는 **갤럭시 노트20(안드로이드)** — 기기 내장 인식기를 쓰는 갈래라
+> 그 갈래가 조용히 죽었을 때가 문제였다. 아이폰이 아니라는 점을 기억할 것.
 
 > 참고: `188adc2`는 처음에 기능 브랜치에만 올라가 있어서 사이트에 반영되지 않았다.
 > 스탬프북 페이지는 **`main`을 본다**. 앞으로도 작업이 끝나면 반드시 main 까지 올릴 것.
@@ -101,17 +107,33 @@
 | 아이폰에서 카메라 권한이 조용히 거부됨 | 인식기 파일(수백 KB)을 먼저 받느라 버튼 누른 시점이 만료 | 카메라부터 열고 인식기를 나중에 고름 |
 | 통신망·차단기 뒤에서 인식 불가 | 인식기를 외부 CDN에서 받아옴 | `lib/`에 넣어 저장소에서 먼저 읽음 |
 | 사진에서 찾기가 QR만 겨우 읽음 | `flReader`를 카메라 켤 때만 만들어서 사진 경로에선 항상 null | `decodeImageFile`에서도 없으면 만들어 줌 |
-| 인쇄된 탑승권이 안 읽힘 | 한 가지 방식으로만 봐서 놓침 | 프레임마다 5가지 방식을 번갈아 시도 (`SCAN_PASSES`) |
+| 인쇄된 탑승권이 안 읽힘 | 한 가지 방식으로만 봐서 놓침 | 프레임마다 여러 방식을 번갈아 시도 (`SCAN_PASSES`) |
+| **안드로이드에서 아무리 비춰도 안 읽힘** | 기기 내장 인식기를 한 번 고르면 **갈아탈 방법이 없었다.** Play 서비스 바코드 부품이 없으면 오류도 없이 "못 찾았다"만 영원히 돌려준다 | 내장으로 8프레임(약 1초) 안에 못 읽으면 같은 화면을 ZXing 갈래로도 훑는다 (`NATIVE_GRACE` · `zxScanFrame`). `detect()`가 오류를 던지는 기기도 있어 `try/catch`로 감쌌다 |
+| 번들거리거나 굽은 종이 탑승권을 놓침 | 화면 **전체**의 밝기 차이만 벌려서(`boostContrast`) 한쪽만 밝은 사진을 못 잡음 | **자리마다 밝기를 따로 재서** 검정/흰색을 가른다 (`adaptiveBin` · 적분영상이라 창이 커도 픽셀당 한 번). 갈래마다 **줄이는 크기도 다르게** 한다 |
 
-**인식 방식은 5가지를 번갈아 쓴다** (`SCAN_PASSES`): 있는 그대로 / 가운데 확대 /
-원본 해상도 / 밝기 차이 벌리기 / 이진화 방식 변경. ZXing 이 놓친 프레임은 같은 화면을
-jsQR 로 한 번 더 본다. 사진은 멈춰 있으므로 줄인 화면·원본 화면 양쪽으로 전부 시도한다.
-🔦 플래시 버튼이 있고(기기가 지원할 때만 표시), 카메라는 1920 해상도·연속 초점으로 연다.
+**인식 방식은 9가지를 번갈아 쓴다** (`SCAN_PASSES`). 실제 종이 탑승권으로 재보면
+**촬영 거리마다 이기는 갈래가 매번 다르다.** 세 축을 섞는다:
+- `adap` — 자리마다 밝기를 따로 재서 검정/흰색을 가른다 (번들거림·굽은 종이·그림자에 강하다)
+- `max` — 줄이는 크기를 갈래마다 다르게 (같은 사진도 줄이는 크기에 따라 읽히고 안 읽힌다)
+- `zoom` — 가운데만 확대 (코드가 멀리서 작게 잡힐 때)
 
-**검증 방법** (다시 손볼 일이 생기면 그대로 재현할 것): python `qrcode`·`pdf417gen`·`Pillow`
-로 탑승권 모양 이미지를 만들고 흔들림·형광등 번들거림·기울기·거리를 입혀 29장을 만든 뒤
-브라우저에서 실제 코드 경로로 돌린다. 현재 카메라 25/29, 사진 QR 5/5.
-남은 실패는 심하게 흐린 종이 PDF417 — ZXing 의 한계이고 안드로이드 내장 인식기는 대부분 읽는다.
+ZXing 이 놓친 프레임은 같은 화면을 jsQR 로 한 번 더 본다. 사진은 멈춰 있으므로 줄인 화면·원본
+화면 양쪽으로 전부 시도한다. 🔦 플래시 버튼이 있고(기기가 지원할 때만 표시),
+카메라는 1920 해상도·연속 초점으로 연다.
+
+**인식기는 3단계인데, 1단계가 죽어도 넘어가야 한다.** 기기 내장(BarcodeDetector) →
+ZXing → jsQR 순으로 고르되, 내장으로 `NATIVE_GRACE`(8프레임 ≈ 1초) 안에 못 읽으면
+같은 화면을 ZXing 갈래로도 훑는다(`zxScanFrame`). 이 길이 없으면 안드로이드에서 통째로 죽는다.
+
+**검증 방법** (다시 손볼 일이 생기면 그대로 재현할 것): jeju 저장소의 `tools/` 를 쓴다.
+```bash
+pip install qrcode pillow pdf417gen
+python3 tools/make-test-passes.py /tmp/passes   # 시험 이미지 20장 생성
+node tools/verify-scan.mjs /tmp/passes          # 실제 스캔 경로로 확인
+```
+기준값 **16/20 인식 · 실시간 카메라 흐름 통과 · 내장 인식기 고장 흉내 2가지 통과.**
+남은 실패 4건은 심하게 흐린 종이 PDF417 — ZXing 의 한계이고 안드로이드 내장 인식기는 대부분 읽는다.
+(카메라가 없는 컨테이너에서는 캔버스 `captureStream()` 으로 가짜 카메라를 만들어 물린다)
 
 ## 장소 하나를 추가할 때 같이 채워지는 표
 
@@ -130,32 +152,34 @@ CAT_EMOJI CHEAPG CHEAP_GROUPS CHIPS CHO_LIST CJU_LIVE COUPLE_KEY DOW
 DOW_F EFF EFFORT EFF_OF EFF_ORDER FKEY FT FTYPE GLOSSARY GLO_KEYS GLO_RE
 HOTELTIER HOTEL_T ICAO_IATA JEJU_AIRPORT KEY LL LOTTE LOTTE_ALL
 LOTTE_IDS LOTTE_URL MUST MUSTBAR MUSTEAT MUSTHOTEL MUSTSHOP MUSTSPA
-NEAR_LIMIT_KM NM PHOTO PK PKMAP PKT PK_OF PK_ORDER PLACES QR_LIBS
-READ_URL SCAN_LIBS SHOPTIER SHOP_T SPATIER SPA_T STARS TEL TIERMAP
-UPD_SEEN_KEY UPD_URL VJ WRITE_URL ZONES ZONE_KW ZONE_OF activeEff
-activeZone addCheapGroups addCustomPlace addEffGroups addFoodGroups
-addGrid addRouteGrid addSubHead addTierGroups allPlaces apIsKR apLive
-apName apOptions autoSync barNear bcbpShift byEff byPk camError
-carrierName cdText chipMatch chipsEl clearNearby closeFlight copyAddr
-currentFilter customPlaces customToCard daysAway decodeImageFile
-delFlight deleteCustomPlace distKm drawLotte drawUpd drawUpdFail effGrid
-effOf ensureJsQR ensureZXing escHtml fetchRemote flCanvas flDraft flMsg
-flStream flightIntl flightModal flightSearch flightTimes fmtDateF fmtDay
-fmtDist fmtHM ftOf getNativeDetector gloDef gloInput gloModal gloSug
-gloWord glossify grabCanvas grabPixels hasPlace hopKm hoursModal
-isWished isoDate jsqrRead julianToISO list llOf loadFlights loadScript
-lotteModal lsGet lsSet makeCard markUpdBtn matchesEff matchesSearch
-mergeCustom modal myFlights nearbyBtn nearbyOn normalize onDecoded
-onSelEnd online openFlight openGlo openUpd parseBCBP parseLoose
-parsePass passes pathLen persistFlights pickEngine pkOf placeText
-planGroup pushRemote rateOf rateSrc rates render renderAirTable
-renderApSteps renderEffMenu renderFilterBar renderFlightBar
-renderFlightForm renderFlightPreview renderHoursTable renderPlan
-renderPlanByDate renderPlanByZone renderSavedFlights renderZoneMenu
-routeNote routeOrder saveDraft saveLocal saveRate saveWish scrollToList
-searchClear searchInput searchQ selBtn setAiLinks setEngine setFlPane
-setTab setWishDate showGlo sortFlights startScan stopScan syncChips
-syncDraft ticketHtml toCho toggleBarNear toggleVisit toggleWish updBtn
-updFeed updModal updSeen updateProgress updateSyncLabel updateVisitedTab
-visibleCount visited wish zoneGrid zoneOf zxDecodeCanvas zxHints
+NATIVE_GRACE NEAR_LIMIT_KM NM PHOTO PK PKMAP PKT PK_OF PK_ORDER PLACES
+QR_LIBS READ_URL SCAN_LIBS SCAN_MAX SCAN_MAX_FULL SCAN_PASSES SHOPTIER
+SHOP_T SPATIER SPA_T STARS TEL TIERMAP UPD_SEEN_KEY UPD_URL VJ WRITE_URL
+ZONES ZONE_KW ZONE_OF activeEff activeZone adaptiveBin addCheapGroups
+addCustomPlace addEffGroups addFoodGroups addGrid addRouteGrid
+addSubHead addTierGroups allPlaces apIsKR apLive apName apOptions
+autoSync barNear bcbpShift boostContrast byEff byPk camError carrierName
+cdText chipMatch chipsEl clearNearby closeFlight copyAddr currentFilter
+customPlaces customToCard daysAway decodeImageFile delFlight
+deleteCustomPlace distKm drawLotte drawUpd drawUpdFail effGrid effOf
+ensureJsQR ensureZXing escHtml fetchRemote flCanvas flDraft flMsg flPass
+flStream flTorchOn flightIntl flightModal flightSearch flightTimes
+fmtDateF fmtDay fmtDist fmtHM ftOf getNativeDetector gloDef gloInput
+gloModal gloSug gloWord glossify grabCanvas grabPixels hasPlace hopKm
+hoursModal isWished isoDate jsqrCanvas jsqrRead julianToISO list llOf
+loadFlights loadScript lotteModal lsGet lsSet makeCard markUpdBtn
+matchesEff matchesSearch mergeCustom modal myFlights nearbyBtn nearbyOn
+nextPass normalize onDecoded onSelEnd online openFlight openGlo openUpd
+parseBCBP parseLoose parsePass passes pathLen persistFlights pickEngine
+pkOf placeText planGroup pushRemote rateOf rateSrc rates render
+renderAirTable renderApSteps renderEffMenu renderFilterBar
+renderFlightBar renderFlightForm renderFlightPreview renderHoursTable
+renderPlan renderPlanByDate renderPlanByZone renderSavedFlights
+renderZoneMenu routeNote routeOrder saveDraft saveLocal saveRate
+saveWish scrollToList searchClear searchInput searchQ selBtn setAiLinks
+setEngine setFlPane setTab setWishDate setupTorch showGlo sortFlights
+startScan stopScan syncChips syncDraft ticketHtml toCho toggleBarNear
+toggleTorch toggleVisit toggleWish torchTrack updBtn updFeed updModal
+updSeen updateProgress updateSyncLabel updateVisitedTab visibleCount
+visited wish zoneGrid zoneOf zxDecodeCanvas zxHints zxScanFrame
 ```
