@@ -67,7 +67,8 @@ description: 부부 2인용 여행 스탬프북 웹사이트를 제작·배포�
     - 저장하면 메인 화면 위쪽에 **다음 항공편 카운트다운 바**가 뜨고, 누르면 바로 그 화면으로 감
     - 🔒 탑승객 이름·예약번호가 들어가므로 **두 사람 공유 저장소에 올리지 않고 각자 기기에만 저장**(`jeju_flights_v1`). 이 원칙을 깨고 공유 저장소로 옮기지 말 것
     - 📄 **번들거리는 종이 탑승권도 읽는다.** 자리마다 밝기를 따로 재는 방식(`adaptiveBin`)을 섞어 쓰기 때문. 실제 t'way 종이 탑승권을 촬영 거리 5가지로 시험해 전부 0.5~3초에 읽었다
-    - 🤖 **인식기 한 개가 죽어도 안 멈춘다.** 안드로이드 내장 인식기로 1초 안에 못 읽으면 예비 인식기(ZXing)를 같은 화면에 함께 돌린다
+    - 🤖 **인식기 한 개가 죽어도 안 멈춘다.** 매 프레임 기기 내장 → ZXing/jsQR 순으로 **둘 다** 돌린다. 내장 인식기가 유일한 길이 되는 구조를 만들지 말 것
+    - 📊 스캔 중 화면 아래에 **상태줄**이 뜬다 (`인식기 이름 · 확인 횟수 · 화면 크기 · 밝기`). "안 읽힌다"는 제보가 오면 이 줄을 찍어 보내달라고 하면 원인이 한 줄로 갈린다
   - 🕐 **항공사 운영시간** — 그 지역 노선 항공사의 고객센터 번호·상담시간·수속 마감 기준을 카드로. 공항 콜센터도 함께
   - 🧭 **공항에서 어디로** — 공항 층별 구조와 탑승까지 단계 안내. 탑승구는 당일 배정이라 **실시간 운항정보 링크**로 연결
 - ➕ 장소 추가/삭제(카테고리·강도·메모 선택), 백업/복원, 두 사람 도장·추가 장소·가보고 싶은 곳·할인율 자동 연동(로그인 없음)
@@ -151,15 +152,17 @@ bash에서 curl로 받는다. 이 파일이 검증된 완성 코드이므로 **�
   - 새 지역도 **같은 jeju 저장소 안에** 만들면 `lib/`를 공유하므로 손댈 것이 없다
   - 다른 저장소로 옮길 땐 `lib/` 폴더를 **통째로 같이 복사**할 것. 빠뜨리면 외부 주소로 받으러 가는데, 막힌 통신망이나 광고 차단기 뒤에서는 인식이 통째로 죽는다
 - **로직은 전부 변경 금지**: `toCho` `matchesSearch` `chipMatch` `zoneOf` `effOf` `pkOf` `ftOf` `passes` `render` `makeCard` `distKm` `fmtDist` `glossify` `openUpd` `drawUpd` `copyAddr` `setAiLinks` `renderPlan` `renderPlanByZone` `renderPlanByDate` `toggleWish` `setWishDate` `saveWish` `saveRate` `rateOf` `rateSrc` `addCheapGroups` `addTierGroups` `drawLotte` `fmtDay` `daysAway` `routeOrder` `addRouteGrid` `routeNote` `hopKm` `pathLen` `llOf`, fetch→병합→push 패턴, 10초 폴링, visibilitychange
-  - 항공편 쪽도 전부 변경 금지: `parseBCBP` `bcbpShift` `parseLoose` `parsePass` `julianToISO` `flightTimes` `pickEngine` `startScan` `stopScan` `onDecoded` `grabCanvas` `grabPixels` `zxDecodeCanvas` `jsqrRead` `jsqrCanvas` `zxHints` `getNativeDetector` `ensureZXing` `ensureJsQR` `decodeImageFile` `ticketHtml` `renderFlightBar` `loadFlights` `persistFlights` `adaptiveBin` `boostContrast` `zxScanFrame` `nextPass`
+  - 항공편 쪽도 전부 변경 금지: `parseBCBP` `bcbpShift` `parseLoose` `parsePass` `julianToISO` `flightTimes` `pickEngine` `startScan` `stopScan` `onDecoded` `grabCanvas` `grabPixels` `zxDecodeCanvas` `jsqrRead` `jsqrCanvas` `zxHints` `getNativeDetector` `ensureZXing` `ensureJsQR` `decodeImageFile` `ticketHtml` `renderFlightBar` `loadFlights` `persistFlights` `adaptiveBin` `boostContrast` `nextPass` `withTimeout` `frameBrightness`
   - ⚠️ 특히 **스캔 순서를 바꾸지 말 것.** 카메라를 먼저 켜고 그다음에 인식기를 고르는 순서인데, 이걸 뒤집으면 아이폰에서 카메라 권한이 조용히 거부된다
   - ⚠️ 인식기에 **화면을 직접 넘기지 말고 캔버스로 떠서 넘길 것**(`grabCanvas` → `zxDecodeCanvas`). 영상을 그대로 넘기면 화면은 나오는데 아무리 비춰도 인식이 안 된다 (실제로 겪은 문제)
   - ⚠️ **`SCAN_PASSES` 9가지를 줄이지 말 것.** 인쇄된 탑승권은 한 가지 방식으로만 보면 자주 놓친다. 실제 종이 탑승권 사진으로 재보면 **촬영 거리마다 이기는 갈래가 매번 다르다.** 세 축을 섞어 쓴다:
     - `adap` — 자리마다 밝기를 따로 재서 검정/흰색을 가른다 (번들거림·굽은 종이·그림자). **화면 전체 밝기를 한꺼번에 늘리는 방식(`boost`)으로는 한쪽만 밝은 사진을 못 잡는다**
     - `max` — 줄이는 크기를 갈래마다 다르게 한다. 같은 사진도 **줄이는 크기에 따라 읽히고 안 읽힌다**
     - `zoom` — 가운데만 확대한다 (코드가 멀리서 작게 잡힐 때)
-  - ⚠️ **기기 내장 인식기(BarcodeDetector)만 믿지 말 것.** 안드로이드에서 Play 서비스의 바코드 부품이 없으면 **오류도 없이 "못 찾았다"만 영원히 돌려준다.** 예전엔 내장 인식기를 한 번 고르면 갈아탈 방법이 없어 아무리 비춰도 영영 안 읽혔다 (실제로 겪은 문제)
-    - 반드시 **넘어갈 길을 남겨둘 것**: 내장으로 `NATIVE_GRACE`(8프레임 ≈ 1초) 안에 못 읽으면 같은 화면을 ZXing 갈래로도 훑는다(`zxScanFrame`). `detect()`가 오류를 던지는 기기도 있으므로 `try/catch`로 감쌀 것
+  - ⚠️ **기기 내장 인식기(BarcodeDetector)만 믿지 말 것.** 같은 폰에서 **두 번 연속으로 사용자를 막은 함정**이다. 안드로이드에서 Play 서비스의 바코드 부품이 없거나 받는 중이면 내장 인식기가 세 가지로 고장 난다: 빈손만 돌려주거나 · 오류를 던지거나 · **아예 답을 안 준다**
+    - ⚠️⚠️ **내장 인식기를 부를 때는 반드시 `withTimeout`으로 감쌀 것.** `await det.detect(v)`만 걸어두면 답이 없는 기기에서 **스캔 루프가 첫 프레임에서 멎는다.** `await BarcodeDetector.getSupportedFormats()`가 멎으면 **스캔이 시작조차 못 한다** (카메라 화면만 뜨고 아무 반응 없음). `try/catch`로는 못 잡는다 — 오류가 아니라 그냥 안 끝나는 것이라서
+    - 제한 시간을 두 번 넘기면 **내장 인식기를 아예 끄고** 우리 인식기만 쓴다
+    - 인식기를 **하나로 합쳐서** 매 프레임 내장 → ZXing/jsQR 을 다 돌릴 것. "내장이 실패하면 그때 갈아탄다"는 구조는 위 세 번째 고장(답이 없음)에서 갈아타는 코드 자체가 실행되지 않아 소용없다
   - ⚠️ 사진에서 찾는 경로(`decodeImageFile`)에서도 **인식기가 없으면 만들어 줄 것.** 카메라를 켤 때만 만들면 사진만 넣었을 때 조용히 실패한다 (실제로 겪은 문제)
   - ⚠️ 저장 구조에 `w`(가보고 싶은 곳)·`r`(할인율)이 포함됨. 병합 로직에서 이 두 칸을 빠뜨리면 **일정과 할인율 메모가 두 사람 사이에서 사라짐**
 - 수정 후 반드시 `node --check`로 문법 검증
@@ -169,7 +172,8 @@ bash에서 curl로 받는다. 이 파일이 검증된 완성 코드이므로 **�
   python3 tools/make-test-passes.py /tmp/passes   # 시험 이미지 20장 생성
   node tools/verify-scan.mjs /tmp/passes          # 실제 스캔 경로로 확인
   ```
-  기준값 **16/20 인식 · 실시간 카메라 흐름 통과 · 내장 인식기 고장 흉내 2가지 통과.** 이보다 떨어지면 뭔가 망가진 것이다
+  기준값 **16/20 인식 · 실시간 카메라 흐름 통과 · 내장 인식기 고장 흉내 4가지 통과**
+  (빈손 / 오류 / 답이 영영 없음 / 형식 조회부터 답이 없음). 이보다 떨어지면 뭔가 망가진 것이다
   (실패하는 4건은 심하게 흐린 종이 PDF417 — ZXing 의 한계다. 안드로이드 내장 인식기는 이 경우도 대부분 읽는다)
 - 새 지역판을 만들 때 `tools/`와 `CLAUDE.md`는 **jeju 저장소 안에 그대로 두면 된다** (사이트에서 쓰지 않는 개발용 파일)
 
