@@ -152,6 +152,8 @@ bash에서 curl로 받는다. 이 파일이 검증된 완성 코드이므로 **�
   - 항공편 쪽도 전부 변경 금지: `parseBCBP` `bcbpShift` `parseLoose` `parsePass` `julianToISO` `flightTimes` `pickEngine` `startScan` `stopScan` `onDecoded` `grabCanvas` `grabPixels` `zxDecodeCanvas` `jsqrRead` `zxHints` `getNativeDetector` `ensureZXing` `ensureJsQR` `decodeImageFile` `ticketHtml` `renderFlightBar` `loadFlights` `persistFlights`
   - ⚠️ 특히 **스캔 순서를 바꾸지 말 것.** 카메라를 먼저 켜고 그다음에 인식기를 고르는 순서인데, 이걸 뒤집으면 아이폰에서 카메라 권한이 조용히 거부된다
   - ⚠️ 인식기에 **화면을 직접 넘기지 말고 캔버스로 떠서 넘길 것**(`grabCanvas` → `zxDecodeCanvas`). 영상을 그대로 넘기면 화면은 나오는데 아무리 비춰도 인식이 안 된다 (실제로 겪은 문제)
+  - ⚠️ **`SCAN_PASSES` 5가지를 줄이지 말 것.** 인쇄된 탑승권은 한 가지 방식으로만 보면 자주 놓친다 (있는 그대로 / 가운데 확대 / 원본 해상도 / 밝기 차이 벌리기 / 이진화 방식 변경을 번갈아 쓴다)
+  - ⚠️ 사진에서 찾는 경로(`decodeImageFile`)에서도 **인식기가 없으면 만들어 줄 것.** 카메라를 켤 때만 만들면 사진만 넣었을 때 조용히 실패한다 (실제로 겪은 문제)
   - ⚠️ 저장 구조에 `w`(가보고 싶은 곳)·`r`(할인율)이 포함됨. 병합 로직에서 이 두 칸을 빠뜨리면 **일정과 할인율 메모가 두 사람 사이에서 사라짐**
 - 수정 후 반드시 `node --check`로 문법 검증
 
